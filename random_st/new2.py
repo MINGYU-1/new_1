@@ -69,7 +69,7 @@ for i in np.random.randint(1,100,size = 20):
     model = Model1(x_dim,x2_dim,c_dim,c2_dim, z_dim=8).to(device)
     early_stopping = EarlyStopping(patience=40,min_delta = 1e-9)
     optimizer = optim.Adam(model.parameters(),lr = 1e-3, weight_decay=1e-5)
-    epochs = 600
+    epochs = 20
     ### train_val loader에서의 학습
     for epoch in range(1,epochs+1):
         model.train()
