@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-def loss1(binary_logit, x_hat, x,x2, mu, logvar,mu2,logvar2, alpha=1.0,beta=1.0, gamma=1.0, d=1.0):
+def loss2(binary_logit, x_hat, x,x2, mu, logvar,mu2,logvar2, a=1.0,b=1.0, c=1.0, d=1.0):
     
     batch_size = x.shape[0]
 
@@ -19,11 +19,12 @@ def loss1(binary_logit, x_hat, x,x2, mu, logvar,mu2,logvar2, alpha=1.0,beta=1.0,
 
     # 최종 손실 합산 (가중치 조절)
     # 각 loss를 batch_size로 나누어 평균 손실을 구함
-    total_loss = (alpha* mse_loss + beta * bce_loss + gamma * kl_loss+d*kl2_loss) / batch_size
+    total_loss = (a* mse_loss + b * bce_loss + c * kl_loss+d*kl2_loss) / batch_size
 
     return {
         'loss': total_loss,
-        'bce_loss': bce_loss / batch_size,
         'mse_loss': mse_loss / batch_size,
+        'bce_loss': bce_loss / batch_size,
         'kl_loss': kl_loss / batch_size,
+        'kl2_loss': kl2_loss / batch_size,
     }

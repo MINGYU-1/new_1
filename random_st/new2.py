@@ -17,8 +17,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import seaborn as sns
-from model1.m2 import Model1
-from loss1.l2 import loss1
+from model1.m2 import Model2
+from loss1.l2 import loss2
 import joblib
 import torch
 import numpy as np
@@ -51,44 +51,43 @@ for i in np.random.randint(1,100,size = 20):
     c_train,c_val,c_test = [torch.tensor(c, dtype = torch.float32) for c in [c_train,c_val,c_test]]
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    train_data = [x_train,x_train,c_train,c_train]
-    val_data = [x_val,x_val,c_val,c_val]
-    test_data = [x_test,x_test,c_test,c_test]
+    train_data = [x_train,x_train,c_train]
+    val_data = [x_val,x_val,c_val]
+    test_data = [x_test,x_test,c_test]
     train_data = TensorDataset(*train_data)
     val_data = TensorDataset(*val_data)
     test_data = TensorDataset(*test_data)
     datas = [train_data,val_data,test_data]
     train_loader,val_loader,test_loader = [DataLoader(x,batch_size = 64,shuffle=False) for x in datas]
-    x_sample,x2_sample, c_sample,c2_sample = next(iter(train_loader))
+    x_sample,x2_sample, c_sample= next(iter(train_loader))
 
     x_dim = x_sample.shape[1]
     x2_dim= x2_sample.shape[1]
     c_dim = c_sample.shape[1]
-    c2_dim = c2_sample.shape[1]
 
-    model = Model1(x_dim,x2_dim,c_dim,c2_dim, z_dim=8,z2_dim = 8).to(device)
+    model = Model2(x_dim,x2_dim,c_dim, z_dim=8,z2_dim = 8).to(device)
     early_stopping = EarlyStopping(patience=40,min_delta = 1e-9)
     optimizer = optim.Adam(model.parameters(),lr = 1e-3, weight_decay=1e-5)
-    epochs = 20
+    epochs = 800
     ### train_val loader에서의 학습
     for epoch in range(1,epochs+1):
         model.train()
         t_loss= 0
-        for x,x2, c, c2 in train_loader:
-            x,x2,c,c2 = x.to(device),x2.to(device),c.to(device),c2.to(device)
+        for x,x2, c in train_loader:
+            x,x2,c = x.to(device),x2.to(device),c.to(device)
             optimizer.zero_grad()
-            bce_logit,x_hat, mu, logvar,mu2,logvar2 = model(x,x2,c,c2)
-            loss_dict = loss1(bce_logit,x_hat,x,x2,mu,logvar,mu2,logvar2)
+            bce_logit,x_hat, mu, logvar,mu2,logvar2 = model(x,x2,c)
+            loss_dict = loss2(bce_logit,x_hat,x,x2,mu,logvar,mu2,logvar2)
             loss_dict['loss'].backward()
             optimizer.step()
             t_loss +=loss_dict['loss'].item()
         model.eval()
         v_loss = 0
         with torch.no_grad():
-            for v_x,v2_x, v_c,v2_c in val_loader:
-                v_x,v2_x,v_c,v2_c = v_x.to(device),v2_x.to(device),v_c.to(device),v2_c.to(device)
-                v_bce_logit,v_x_hat, v_mu, v_logvar,v2_mu,v2_logvar = model(v_x,v2_x,v_c,v2_c)
-                loss_dict = loss1(v_bce_logit,v_x_hat, v_x,v2_x, v_mu,v_logvar,v2_mu,v2_logvar)
+            for v_x,v2_x, v_c in val_loader:
+                v_x,v2_x,v_c = v_x.to(device),v2_x.to(device),v_c.to(device)
+                v_bce_logit,v_x_hat, v_mu, v_logvar,v2_mu,v2_logvar = model(v_x,v2_x,v_c)
+                loss_dict = loss2(v_bce_logit,v_x_hat, v_x,v2_x, v_mu,v_logvar,v2_mu,v2_logvar)
                 v_loss += loss_dict['loss'].item()
         avg_train_loss = t_loss/len(train_loader)
         avg_val_loss = v_loss/len(val_loader)
@@ -98,7 +97,6 @@ for i in np.random.randint(1,100,size = 20):
         if early_stopping(avg_val_loss,model):
             break
 
-    from bce_metrics.bce_solve import eval_bce_metrics
     early_stopping.load_best_model(model)
     model.eval()
     all_x_hat = []
@@ -106,9 +104,9 @@ for i in np.random.randint(1,100,size = 20):
     mse_logit_list = []
     x_true_list = []
     with torch.no_grad():
-        for x_t,x2_t, c_t,c2_t in test_loader:
-            x_t,x2_t,c_t,c2_t = x_t.to(device),x2_t.to(device),c_t.to(device),c2_t.to(device)
-            bce_logit_t,x_hat, mu_t,logvar_t,mu2_t,logvar2_t = model(x_t,x2_t,c_t,c2_t)
+        for x_t,x2_t, c_t in test_loader:
+            x_t,x2_t,c_t = x_t.to(device),x2_t.to(device),c_t.to(device)
+            bce_logit_t,x_hat, mu_t,logvar_t,mu2_t,logvar2_t = model(x_t,x2_t,c_t)
             x_true = (x_t>0).float()
             mse_logit_list.append(x_hat.cpu().numpy())
             x_true_list.append(x_t.cpu().numpy())
