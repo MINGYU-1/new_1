@@ -1,4 +1,4 @@
-    """
+"""
     epoch: 1부터 시작
     gamma_max: 각 사이클에서 도달할 KL 최대 가중치
     cycle_len: 한 사이클 길이 (epoch)

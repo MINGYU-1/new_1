@@ -28,7 +28,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from kl_divergence.cyclical import gamma_cyclical
 from kl_divergence.linear import gamma_linear
-from kl_divergence.sigmoid import sigmoid
+from kl_divergence.sigmoid import gamma_sigmoid
 ### 구하기
 import json
 
@@ -37,7 +37,7 @@ results = {
     "R2_Sigmoid": [],     # bce_prob * mse (sigmoid 가중)
     "R2_Cylical": []          # mse만 (x_hat_fin)
 }
-gamma = gamma_linear(epoch, gamma_max=0.1, center=300,steepness=0.3)
+gamma = gamma_linear(800, gamma_max=0.1, warmup_epochs=200)
 for i in np.random.randint(1,100,size = 20):
     x_data = np.load('./data/metal.npy')
     c_data = np.load('./data/pre_re.npy')
@@ -133,7 +133,7 @@ for i in np.random.randint(1,100,size = 20):
     ##각각의 r2저장
     results["R2_Linear"].append(float(r2_soft_label))
 ### case2
-gamma = gamma_sigmoid(epoch, gamma_max=0.1, center=300,steepness=0.3)
+gamma = gamma_sigmoid(800, gamma_max=0.1, center=300,steepness=0.3)
 for i in np.random.randint(1,100,size = 20):
     x_data = np.load('./data/metal.npy')
     c_data = np.load('./data/pre_re.npy')
@@ -227,10 +227,10 @@ for i in np.random.randint(1,100,size = 20):
     from sklearn.metrics import r2_score,mean_squared_error
     r2_soft_label = r2_score(x_true.flatten(),x_hat_fin.flatten())
     ##각각의 r2저장
-    results["R2_sigmoid"].append(float(r2_soft_label))
+    results["R2_Sigmoid"].append(float(r2_soft_label))
 
 ## case3
-gamma = gamma_sigmoid(epoch, gamma_max=0.1, center=300,steepness=0.3)
+gamma = gamma_cyclical(800, gamma_max=0.1, cycle_len=200,ratio=0.5)
 for i in np.random.randint(1,100,size = 20):
     x_data = np.load('./data/metal.npy')
     c_data = np.load('./data/pre_re.npy')
@@ -324,7 +324,7 @@ for i in np.random.randint(1,100,size = 20):
     from sklearn.metrics import r2_score,mean_squared_error
     r2_soft_label = r2_score(x_true.flatten(),x_hat_fin.flatten())
     ##각각의 r2저장
-    results["R2_Linear"].append(float(r2_soft_label))
+    results["R2_Cylical"].append(float(r2_soft_label))
 
 save_path = "./result_kl_annealing_r2.json"
 with open(save_path, "w", encoding="utf-8") as f:

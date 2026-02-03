@@ -1,5 +1,5 @@
 import math
-    """
+"""
     epoch: 1부터 시작
     gamma_max: 최종 KL 가중치
     center: sigmoid가 중간(0.5*gamma_max)쯤 되는 epoch
