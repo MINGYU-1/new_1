@@ -17,8 +17,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import seaborn as sns
-from model1.m1 import Model1
-from loss1.l1 import loss1
+from model1.m2 import Model1
+from loss1.l2 import loss1
 import joblib
 import torch
 import numpy as np
@@ -66,10 +66,10 @@ for i in np.random.randint(1,100,size = 20):
     c_dim = c_sample.shape[1]
     c2_dim = c2_sample.shape[1]
 
-    model = Model1(x_dim,x2_dim,c_dim,c2_dim, z_dim=8).to(device)
+    model = Model1(x_dim,x2_dim,c_dim,c2_dim, z_dim=8,z2_dim = 8).to(device)
     early_stopping = EarlyStopping(patience=40,min_delta = 1e-9)
     optimizer = optim.Adam(model.parameters(),lr = 1e-3, weight_decay=1e-5)
-    epochs = 800
+    epochs = 20
     ### train_val loader에서의 학습
     for epoch in range(1,epochs+1):
         model.train()
@@ -77,8 +77,8 @@ for i in np.random.randint(1,100,size = 20):
         for x,x2, c, c2 in train_loader:
             x,x2,c,c2 = x.to(device),x2.to(device),c.to(device),c2.to(device)
             optimizer.zero_grad()
-            bce_logit,x_hat, mu, logvar = model(x,x2,c,c2)
-            loss_dict = loss1(bce_logit,x_hat,x,x2,mu,logvar)
+            bce_logit,x_hat, mu, logvar,mu2,logvar2 = model(x,x2,c,c2)
+            loss_dict = loss1(bce_logit,x_hat,x,x2,mu,logvar,mu2,logvar2)
             loss_dict['loss'].backward()
             optimizer.step()
             t_loss +=loss_dict['loss'].item()
@@ -87,8 +87,8 @@ for i in np.random.randint(1,100,size = 20):
         with torch.no_grad():
             for v_x,v2_x, v_c,v2_c in val_loader:
                 v_x,v2_x,v_c,v2_c = v_x.to(device),v2_x.to(device),v_c.to(device),v2_c.to(device)
-                v_bce_logit,v_x_hat, v_mu, v_logvar = model(v_x,v2_x,v_c,v2_c)
-                loss_dict = loss1(v_bce_logit,v_x_hat, v_x,v2_x, v_mu,v_logvar)
+                v_bce_logit,v_x_hat, v_mu, v_logvar,v2_mu,v2_logvar = model(v_x,v2_x,v_c,v2_c)
+                loss_dict = loss1(v_bce_logit,v_x_hat, v_x,v2_x, v_mu,v_logvar,v2_mu,v2_logvar)
                 v_loss += loss_dict['loss'].item()
         avg_train_loss = t_loss/len(train_loader)
         avg_val_loss = v_loss/len(val_loader)
@@ -108,7 +108,7 @@ for i in np.random.randint(1,100,size = 20):
     with torch.no_grad():
         for x_t,x2_t, c_t,c2_t in test_loader:
             x_t,x2_t,c_t,c2_t = x_t.to(device),x2_t.to(device),c_t.to(device),c2_t.to(device)
-            bce_logit_t,x_hat, mu_t,logvar_t = model(x_t,x2_t,c_t,c2_t)
+            bce_logit_t,x_hat, mu_t,logvar_t,mu2_t,logvar2_t = model(x_t,x2_t,c_t,c2_t)
             x_true = (x_t>0).float()
             mse_logit_list.append(x_hat.cpu().numpy())
             x_true_list.append(x_t.cpu().numpy())
