@@ -37,7 +37,8 @@ results = {
 }
 for i in np.random.randint(1,100,size = 20):
     x_data = np.load('./data/metal.npy')
-    c_data = np.load('./data/pre_re_opt.npy')
+    c_data = np.load('./data/pre_re_fin.npy')
+    
     x_train,x_test,c_train,c_test = train_test_split(x_data,c_data, random_state = i,test_size = 0.4)
     x_val,x_test,c_val,c_test = train_test_split(x_test,c_test,random_state = i, test_size = 0.5)
     x_scaler = MinMaxScaler()
