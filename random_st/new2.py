@@ -37,7 +37,7 @@ results = {
 }
 for i in np.random.randint(1,100,size = 20):
     x_data = np.load('./data/metal.npy')
-    c_data = np.load('./data/pre_re.npy')
+    c_data = np.load('./data/pre_re_opt.npy')
     x_train,x_test,c_train,c_test = train_test_split(x_data,c_data, random_state = i,test_size = 0.4)
     x_val,x_test,c_val,c_test = train_test_split(x_test,c_test,random_state = i, test_size = 0.5)
     x_scaler = MinMaxScaler()
@@ -137,7 +137,7 @@ for i in np.random.randint(1,100,size = 20):
     results["R2_BCE_MSE"].append(float(r2_bce_mse_sig))
     results["R2_MSE"].append(float(r2_mse))
 
-save_path = "./results_r2.json"
+save_path = "./results_r2_opt.json"
 with open(save_path, "w", encoding="utf-8") as f:
     json.dump(results, f, ensure_ascii=False, indent=2)
 
