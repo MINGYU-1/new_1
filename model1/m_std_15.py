@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class Model3(nn.Module):
+class Modelstd15(nn.Module):
     def __init__(self,x_dim,x2_dim,c_dim,z_dim,z2_dim, h1=32, h2=64): #z1_dim은 다른 encoder에서 넣은값
         
         #z1은 surrogate만들떄 사용

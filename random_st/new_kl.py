@@ -40,7 +40,7 @@ results = {
 gamma = gamma_linear(800, gamma_max=0.1, warmup_epochs=200)
 for i in np.random.randint(1,100,size = 20):
     x_data = np.load('./data/metal.npy')
-    c_data = np.load('./data/pre_re.npy')
+    c_data = np.load('./data/pre_re_fin.npy')
     x_train,x_test,c_train,c_test = train_test_split(x_data,c_data, random_state = i,test_size = 0.4)
     x_val,x_test,c_val,c_test = train_test_split(x_test,c_test,random_state = i, test_size = 0.5)
     x_scaler = MinMaxScaler()
@@ -136,7 +136,7 @@ for i in np.random.randint(1,100,size = 20):
 gamma = gamma_sigmoid(800, gamma_max=0.1, center=300,steepness=0.3)
 for i in np.random.randint(1,100,size = 20):
     x_data = np.load('./data/metal.npy')
-    c_data = np.load('./data/pre_re.npy')
+    c_data = np.load('./data/pre_re_fin.npy')
     x_train,x_test,c_train,c_test = train_test_split(x_data,c_data, random_state = i,test_size = 0.4)
     x_val,x_test,c_val,c_test = train_test_split(x_test,c_test,random_state = i, test_size = 0.5)
     x_scaler = MinMaxScaler()
@@ -230,10 +230,10 @@ for i in np.random.randint(1,100,size = 20):
     results["R2_Sigmoid"].append(float(r2_soft_label))
 
 ## case3
-gamma = gamma_cyclical(800, gamma_max=0.1, cycle_len=200,ratio=0.5)
+gamma = gamma_cyclical(800, gamma_max=0.1, cycle_len=160,ratio=0.5)
 for i in np.random.randint(1,100,size = 20):
     x_data = np.load('./data/metal.npy')
-    c_data = np.load('./data/pre_re.npy')
+    c_data = np.load('./data/pre_re_fin.npy')
     x_train,x_test,c_train,c_test = train_test_split(x_data,c_data, random_state = i,test_size = 0.4)
     x_val,x_test,c_val,c_test = train_test_split(x_test,c_test,random_state = i, test_size = 0.5)
     x_scaler = MinMaxScaler()
