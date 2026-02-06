@@ -32,8 +32,8 @@ import json
 
 ### Space Time 넣기  random_state
 results = {
-    "R2_Space_Time": [],      # bce_binary * mse (최종)
-    "R2_Except_Space_Time": [],     # bce_prob * mse (sigmoid 가중)
+    "R2_React": [],      # bce_binary * mse (최종)
+    "R2_Without_React": [],     # bce_prob * mse (sigmoid 가중)
 }
 for i in np.random.randint(1,100,size = 20):
     x_data = np.load('./data/metal.npy')
@@ -130,12 +130,12 @@ for i in np.random.randint(1,100,size = 20):
     from sklearn.metrics import r2_score,mean_squared_error
     r2_bce_mse_sig = r2_score(x_true.flatten(),final_x_sig.flatten())
     ##r2저장
-    results["R2_Space_Time"].append(float(r2_bce_mse_sig))
+    results["R2_React"].append(float(r2_bce_mse_sig))
 
 ### Space time 제외
 for i in np.random.randint(1,100,size = 20):
     x_data = np.load('./data/metal.npy')
-    c_data = np.load('./data/pre_re_exc_sp.npy')
+    c_data = np.load('./data/pre_re_without_reac.npy')
     
     x_train,x_test,c_train,c_test = train_test_split(x_data,c_data, random_state = i,test_size = 0.4)
     x_val,x_test,c_val,c_test = train_test_split(x_test,c_test,random_state = i, test_size = 0.5)
@@ -228,7 +228,7 @@ for i in np.random.randint(1,100,size = 20):
     from sklearn.metrics import r2_score,mean_squared_error
     r2_bce_mse_sig = r2_score(x_true.flatten(),final_x_sig.flatten())
     ##각각의 r2저장
-    results["R2_Except_Space_Time"].append(float(r2_bce_mse_sig))
+    results["R2_Without_React"].append(float(r2_bce_mse_sig))
 
 save_path = "./results_Space_Presence.json"
 with open(save_path, "w", encoding="utf-8") as f:
